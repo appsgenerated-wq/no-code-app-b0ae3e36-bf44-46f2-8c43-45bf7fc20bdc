@@ -1,0 +1,95 @@
+name: MarsFood
+
+entities:
+  User:
+    authenticable: true
+    properties:
+      - name
+      - name: email
+        type: email
+      - name: role
+        type: choice
+        options:
+          values: [colonist, scientist]
+        default: colonist
+    policies:
+      create:
+        - access: admin
+      read:
+        - access: restricted
+          allow: User
+          condition: self
+      update:
+        - access: restricted
+          allow: User
+          condition: self
+      delete:
+        - access: admin
+      signup:
+        - access: public
+
+  Meal:
+    properties:
+      - name: name
+        type: string
+      - name: description
+        type: text
+      - name: calories
+        type: number
+      - name: category
+        type: choice
+        options:
+          values: [Breakfast, Lunch, Dinner, Snack]
+        default: Lunch
+      - name: photo
+        type: image
+    belongsTo:
+      - { name: creator, entity: User }
+    policies:
+      create:
+        - access: restricted
+          allow: User
+      read:
+        - access: restricted
+          allow: User
+      update:
+        - access: restricted
+          allow: User
+          condition: self
+      delete:
+        - access: restricted
+          allow: User
+          condition: self
+
+  ConsumptionLog:
+    properties:
+      - name: notes
+        type: text
+    belongsTo:
+      - { name: colonist, entity: User }
+      - { name: meal, entity: Meal }
+    policies:
+      create:
+        - access: restricted
+          allow: User
+      read:
+        - access: restricted
+          allow: User
+          condition: self
+      update:
+        - access: restricted
+          allow: User
+          condition: self
+      delete:
+        - access: restricted
+          allow: User
+          condition: self
+
+
+# Health check endpoint for connection testing
+endpoints:
+  health:
+    path: /api/health
+    method: GET
+    policies: []
+    handler: healthCheck
